@@ -1,0 +1,87 @@
+/**
+ * Repository access + codebase pattern extraction report.
+ *
+ * This file is used as a mandatory pre-coding checkpoint to confirm the repo is mounted
+ * and to capture key framework patterns (spec locations, fixtures, BasePage, ActionUtils,
+ * and existing page objects).
+ */
+
+export const repoAccessCheck = {
+  /** Indicates whether the repository root was accessible during analysis. */
+  repoMounted: true,
+
+  /** Repository root listing snapshot (top-level). */
+  rootEntries: [
+    '.eslintrc.js',
+    '.git/',
+    '.prettierrc',
+    'README.md',
+    'config/',
+    'package.json',
+    'playwright.config.ts',
+    'src/',
+    'test-base/',
+    'test-setup/',
+    'tsconfig.json',
+  ],
+
+  /**
+   * Spec/test discovery.
+   * playwright.config.ts sets testDir: './tests' and testMatch: ['**/*.spec.ts'].
+   */
+  specs: {
+    playwrightConfig: {
+      testDir: './tests',
+      testMatch: ['**/*.spec.ts'],
+    },
+    discoveredSpecFiles: [],
+    discoveredTestFiles: [],
+    note:
+      "No '**/*.spec.ts' or '**/*.test.ts' files were found under the mounted repository at analysis time.",
+  },
+
+  /**
+   * Fixtures usage.
+   * Custom fixtures are defined in test-setup/fixtures.ts.
+   */
+  fixtures: {
+    fixtureFile: 'test-setup/fixtures.ts',
+    exported: ['test', 'expect'],
+    fixturesProvided: ['testBase', 'logger', 'allureReporter'],
+    hooks: ['test.beforeEach', 'test.afterEach', 'test.describe.configure({ mode: "parallel" })'],
+  },
+
+  /**
+   * BasePage pattern.
+   * BasePage exists at src/pages/base.page.ts and provides logStep() and navigateTo().
+   */
+  basePage: {
+    file: 'src/pages/base.page.ts',
+    className: 'BasePage',
+    keyApis: ['navigateTo(url)', 'reloadPage()', 'goBack()', 'goForward()', 'getLocator(selector)', 'logStep(message)'],
+    logging: ['Logger.getInstance()', 'AllureReporter.addStep(...)'],
+  },
+
+  /**
+   * ActionUtils pattern.
+   * ActionUtils exists at src/utils/action-utils.ts and provides click/fill helpers.
+   */
+  actionUtils: {
+    file: 'src/utils/action-utils.ts',
+    className: 'ActionUtils',
+    keyApis: ['click(input, { page })', 'fill(input, value, { page })', 'pressPageKeyboard(key, { page })'],
+    waitStrategy: "Internal helper waits for locator.waitFor({ state: 'visible' }).",
+    loggingNote:
+      'ActionUtils.fill currently logs the raw value; do not pass secrets (passwords) directly to ActionUtils.fill unless logging is adjusted/redacted.',
+  },
+
+  /**
+   * Existing page objects.
+   * Only BasePage was found under src/pages; no Login/Contacts page objects were discovered.
+   */
+  pageObjects: {
+    discoveredUnderSrcPages: ['src/pages/base.page.ts'],
+    loginRelated: [],
+    contactsRelated: [],
+  },
+} as const;
